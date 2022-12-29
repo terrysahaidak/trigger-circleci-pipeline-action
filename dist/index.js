@@ -15929,14 +15929,16 @@ async function main() {
 
   const matchedTickedNumber = pr.data.body.match(/SUPMOBILE-\d+/);
 
-  const [maybeTicketNumber] = matchedTickedNumber ? matchedTickedNumber : [];
+    const maybeTicketNumber = matchedTickedNumber
+      ? `- ${matchedTickedNumber[0]}`
+      : '';
 
   const testDetails = actionContext.event.comment.body
     .replace("/testflight", "")
     .trim();
 
   const metaData = `DEV BUILD!!!
-${pr.data.title}${maybeTicketNumber ? `- ${maybeTicketNumber}` : ""} 
+${pr.data.title} ${maybeTicketNumber}
 for branch ${branch}
 trigger by @${actionContext.triggering_actor}
 What to test:
