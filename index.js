@@ -60,7 +60,10 @@ async function main() {
     parameters: parameters,
   };
 
-  const pr = await octokit.rest.pulls.get(context.issue);
+  const pr = await octokit.rest.pulls.get({
+    ...context.repo,
+    pull_number: context.payload.pull_request.number,
+  });
 
   const tag = getTag();
   const branch = pr.data.head.ref; // getBranch();
