@@ -56,9 +56,9 @@ async function main() {
 
   const matchedTickedNumber = pr.data.body.match(/SUPMOBILE-\d+/);
 
-    const maybeTicketNumber = matchedTickedNumber
-      ? `- ${matchedTickedNumber[0]}`
-      : '';
+  const maybeTicketNumber = matchedTickedNumber
+    ? `- ${matchedTickedNumber[0]}`
+    : "";
 
   const testDetails = actionContext.event.comment.body
     .replace("/testflight", "")
