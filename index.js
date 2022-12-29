@@ -1,5 +1,4 @@
 import {
-  getInput,
   setFailed,
   startGroup,
   endGroup,
@@ -10,13 +9,13 @@ import { context, getOctokit } from "@actions/github";
 import axios from "axios";
 
 const octokit = getOctokit(process.env.GITHUB_TOKEN);
+const actionContext = JSON.parse(process.env.GITHUB_CONTEXT);
 
 startGroup("Preparing CircleCI Pipeline Trigger");
 const repoOrg = context.repo.owner;
 const repoName = context.repo.repo;
 info(`Org: ${repoOrg}`);
 info(`Repo: ${repoName}`);
-const ref = context.ref;
 
 // const getBranch = () => {
 //   if (ref.startsWith("refs/heads/")) {
@@ -29,11 +28,11 @@ const ref = context.ref;
 //   }
 //   return ref;
 // };
-const getTag = () => {
-  if (ref.startsWith("refs/tags/")) {
-    return ref.substring(10);
-  }
-};
+// const getTag = () => {
+//   if (ref.startsWith("refs/tags/")) {
+//     return ref.substring(10);
+//   }
+// };
 
 const headers = {
   "content-type": "application/json",
@@ -48,41 +47,38 @@ const parameters = {
 };
 
 async function main() {
-  let metaData = getInput("GHA_Meta");
-
-  metaData = metaData.replace("/testflight", "");
-
-  if (metaData.length > 0) {
-    Object.assign(parameters, { GHA_Meta: metaData });
-  }
-
-  const body = {
-    parameters: parameters,
-  };
-
   const pr = await octokit.rest.pulls.get({
     ...context.repo,
     pull_number: context.payload.pull_request.number,
   });
 
-  const tag = getTag();
-  const branch = pr.data.head.ref; // getBranch();
-  Object.assign(body, { branch });
+  const branch = `${pr.data.head.ref}#${pr.data.head.sha}`;
 
-  // if (tag) {
-  //   Object.assign(body, { tag });
-  // } else {
-  // }
+  const [maybeTicketNumber] = (pr.data.body.match(/SUPMOBILE-\d+/) ?? []);
+
+  const testDetails = actionContext.event.comment.body.replace('/testflight', '').trim();
+
+  const metaData = `DEV BUILD!!!
+${pr.data.title}${maybeTicketNumber ? `- ${maybeTicketNumber}` : ""} 
+for branch ${branch}
+trigger by @${actionContext.triggering_actor}
+What to test:
+${testDetails}
+`;
+
+  const body = {
+    parameters: parameters,
+    branch: pr.data.head.ref,
+    GHA_Meta: metaData,
+  };
 
   const url = `https://circleci.com/api/v2/project/gh/${repoOrg}/${repoName}/pipeline`;
 
   info(`Triggering CircleCI Pipeline for ${repoOrg}/${repoName}`);
   info(`Triggering URL: ${url}`);
-  if (tag) {
-    info(`Triggering tag: ${tag}`);
-  } else {
-    info(`Triggering branch: ${branch}`);
-  }
+
+  info(`Triggering branch: ${branch}`);
+
   info(`Parameters:\n${JSON.stringify(parameters)}`);
   endGroup();
 

@@ -15882,13 +15882,13 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(process.env.GITHUB_TOKEN);
+const actionContext = JSON.parse(process.env.GITHUB_CONTEXT);
 
 (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.startGroup)("Preparing CircleCI Pipeline Trigger");
 const repoOrg = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner;
 const repoName = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo;
 (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Org: ${repoOrg}`);
 (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Repo: ${repoName}`);
-const ref = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.ref;
 
 // const getBranch = () => {
 //   if (ref.startsWith("refs/heads/")) {
@@ -15901,11 +15901,11 @@ const ref = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.ref;
 //   }
 //   return ref;
 // };
-const getTag = () => {
-  if (ref.startsWith("refs/tags/")) {
-    return ref.substring(10);
-  }
-};
+// const getTag = () => {
+//   if (ref.startsWith("refs/tags/")) {
+//     return ref.substring(10);
+//   }
+// };
 
 const headers = {
   "content-type": "application/json",
@@ -15920,38 +15920,38 @@ const parameters = {
 };
 
 async function main() {
-  let metaData = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("GHA_Meta");
+  const pr = await octokit.rest.pulls.get({
+    ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
+    pull_number: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request.number,
+  });
 
-  metaData = metaData.replace("/testflight", "");
+  const branch = `${pr.data.head.ref}#${pr.data.head.sha}`;
 
-  if (metaData.length > 0) {
-    Object.assign(parameters, { GHA_Meta: metaData });
-  }
+  const [maybeTicketNumber] = (pr.data.body.match(/SUPMOBILE-\d+/) ?? []);
+
+  const testDetails = actionContext.event.comment.body.replace('/testflight', '').trim();
+
+  const metaData = `DEV BUILD!!!
+${pr.data.title}${maybeTicketNumber ? `- ${maybeTicketNumber}` : ""} 
+for branch ${branch}
+trigger by @${actionContext.triggering_actor}
+What to test:
+${testDetails}
+`;
 
   const body = {
     parameters: parameters,
+    branch: pr.data.head.ref,
+    GHA_Meta: metaData,
   };
-
-  const pr = await octokit.rest.pulls.get(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue);
-
-  const tag = getTag();
-  const branch = pr.data.head.ref; // getBranch();
-  Object.assign(body, { branch });
-
-  // if (tag) {
-  //   Object.assign(body, { tag });
-  // } else {
-  // }
 
   const url = `https://circleci.com/api/v2/project/gh/${repoOrg}/${repoName}/pipeline`;
 
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Triggering CircleCI Pipeline for ${repoOrg}/${repoName}`);
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Triggering URL: ${url}`);
-  if (tag) {
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Triggering tag: ${tag}`);
-  } else {
-    (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Triggering branch: ${branch}`);
-  }
+
+  (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Triggering branch: ${branch}`);
+
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Parameters:\n${JSON.stringify(parameters)}`);
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.endGroup)();
 
