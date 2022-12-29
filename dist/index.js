@@ -15922,7 +15922,7 @@ const parameters = {
 async function main() {
   const pr = await octokit.rest.pulls.get({
     ..._actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo,
-    pull_number: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request.number,
+    pull_number: actionContext.event.issue.number,
   });
 
   const branch = `${pr.data.head.ref}#${pr.data.head.sha}`;

@@ -49,7 +49,7 @@ const parameters = {
 async function main() {
   const pr = await octokit.rest.pulls.get({
     ...context.repo,
-    pull_number: context.payload.pull_request.number,
+    pull_number: actionContext.event.issue.number,
   });
 
   const branch = `${pr.data.head.ref}#${pr.data.head.sha}`;
