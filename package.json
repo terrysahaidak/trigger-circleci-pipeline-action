@@ -1,5 +1,5 @@
 {
-  "name": "trigger-circleci-pipeline-gha",
+  "name": "trigger-circleci-pipeline-on-comment",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CircleCI-Public/trigger-circleci-pipeline-action.git"
+    "url": "git+https://github.com/terrysahaidak/trigger-circleci-pipeline-action.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/CircleCI-Public/trigger-circleci-pipeline-action/issues"
+    "url": "https://github.com/terrysahaidak/trigger-circleci-pipeline-action/issues"
   },
-  "homepage": "https://github.com/CircleCI-Public/trigger-circleci-pipeline-action#readme",
+  "homepage": "https://github.com/terrysahaidak/trigger-circleci-pipeline-action#readme",
   "dependencies": {
     "@actions/github": "^5.1.1",
     "@actions/core": "^1.10.0",
