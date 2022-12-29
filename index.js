@@ -18,7 +18,6 @@ info(`Org: ${repoOrg}`);
 info(`Repo: ${repoName}`);
 const ref = context.ref;
 
-
 // const getBranch = () => {
 //   if (ref.startsWith("refs/heads/")) {
 //     return ref.substring(11);
@@ -51,7 +50,7 @@ const parameters = {
 async function main() {
   let metaData = getInput("GHA_Meta");
 
-  metaData = metaData.replace('/testflight', '');
+  metaData = metaData.replace("/testflight", "");
 
   if (metaData.length > 0) {
     Object.assign(parameters, { GHA_Meta: metaData });
@@ -64,7 +63,7 @@ async function main() {
   const pr = await octokit.rest.pulls.get(context.issue);
 
   const tag = getTag();
-  const branch = pr.data.head.ref // getBranch();
+  const branch = pr.data.head.ref; // getBranch();
   Object.assign(body, { branch });
 
   // if (tag) {

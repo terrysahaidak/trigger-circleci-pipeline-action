@@ -15890,7 +15890,6 @@ const repoName = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo;
 (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Repo: ${repoName}`);
 const ref = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.ref;
 
-
 // const getBranch = () => {
 //   if (ref.startsWith("refs/heads/")) {
 //     return ref.substring(11);
@@ -15923,7 +15922,7 @@ const parameters = {
 async function main() {
   let metaData = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("GHA_Meta");
 
-  metaData = metaData.replace('/testflight', '');
+  metaData = metaData.replace("/testflight", "");
 
   if (metaData.length > 0) {
     Object.assign(parameters, { GHA_Meta: metaData });
@@ -15936,7 +15935,7 @@ async function main() {
   const pr = await octokit.rest.pulls.get(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.issue);
 
   const tag = getTag();
-  const branch = pr.data.head.ref // getBranch();
+  const branch = pr.data.head.ref; // getBranch();
   Object.assign(body, { branch });
 
   // if (tag) {
