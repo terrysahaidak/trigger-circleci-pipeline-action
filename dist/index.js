@@ -15927,9 +15927,11 @@ async function main() {
 
   const branch = `${pr.data.head.ref}#${pr.data.head.sha}`;
 
-  const [maybeTicketNumber] = (pr.data.body.match(/SUPMOBILE-\d+/) ?? []);
+  const [maybeTicketNumber] = pr.data.body.match(/SUPMOBILE-\d+/) ?? [];
 
-  const testDetails = actionContext.event.comment.body.replace('/testflight', '').trim();
+  const testDetails = actionContext.event.comment.body
+    .replace("/testflight", "")
+    .trim();
 
   const metaData = `DEV BUILD!!!
 ${pr.data.title}${maybeTicketNumber ? `- ${maybeTicketNumber}` : ""} 
