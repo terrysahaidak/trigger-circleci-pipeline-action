@@ -40,11 +40,6 @@ const headers = {
   "x-attribution-actor-id": context.actor,
   "Circle-Token": `${process.env.CCI_TOKEN}`,
 };
-const parameters = {
-  GHA_Actor: context.actor,
-  GHA_Action: context.action,
-  GHA_Event: context.eventName,
-};
 
 async function main() {
   const pr = await octokit.rest.pulls.get({
@@ -73,9 +68,13 @@ ${testDetails}
 `;
 
   const body = {
-    parameters: parameters,
+    parameters: {
+      GHA_Actor: context.actor,
+      GHA_Action: context.action,
+      GHA_Event: context.eventName,
+      GHA_Meta: metaData,
+    },
     branch: pr.data.head.ref,
-    GHA_Meta: metaData,
   };
 
   const url = `https://circleci.com/api/v2/project/gh/${repoOrg}/${repoName}/pipeline`;
@@ -85,7 +84,7 @@ ${testDetails}
 
   info(`Triggering branch: ${branch}`);
 
-  info(`Parameters:\n${JSON.stringify(parameters)}`);
+  info(`Parameters:\n${JSON.stringify(body.parameters)}`);
   endGroup();
 
   axios

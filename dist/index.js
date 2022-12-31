@@ -15913,11 +15913,6 @@ const headers = {
   "x-attribution-actor-id": _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.actor,
   "Circle-Token": `${process.env.CCI_TOKEN}`,
 };
-const parameters = {
-  GHA_Actor: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.actor,
-  GHA_Action: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.action,
-  GHA_Event: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.eventName,
-};
 
 async function main() {
   const pr = await octokit.rest.pulls.get({
@@ -15946,9 +15941,13 @@ ${testDetails}
 `;
 
   const body = {
-    parameters: parameters,
+    parameters: {
+      GHA_Actor: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.actor,
+      GHA_Action: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.action,
+      GHA_Event: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.eventName,
+      GHA_Meta: metaData,
+    },
     branch: pr.data.head.ref,
-    GHA_Meta: metaData,
   };
 
   const url = `https://circleci.com/api/v2/project/gh/${repoOrg}/${repoName}/pipeline`;
@@ -15958,7 +15957,7 @@ ${testDetails}
 
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Triggering branch: ${branch}`);
 
-  (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Parameters:\n${JSON.stringify(parameters)}`);
+  (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.info)(`Parameters:\n${JSON.stringify(body.parameters)}`);
   (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.endGroup)();
 
   axios__WEBPACK_IMPORTED_MODULE_2___default().post(url, body, { headers: headers })
