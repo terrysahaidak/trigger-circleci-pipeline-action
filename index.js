@@ -17,23 +17,6 @@ const repoName = context.repo.repo;
 info(`Org: ${repoOrg}`);
 info(`Repo: ${repoName}`);
 
-// const getBranch = () => {
-//   if (ref.startsWith("refs/heads/")) {
-//     return ref.substring(11);
-//   } else if (ref.startsWith("refs/pull/")) {
-//     info(`This is a PR. Using head PR branch`);
-//     const pullRequestNumber = ref.match(/refs\/pull\/([0-9]*)\//)[1];
-//     const newref = `pull/${pullRequestNumber}/head`;
-//     return newref;
-//   }
-//   return ref;
-// };
-// const getTag = () => {
-//   if (ref.startsWith("refs/tags/")) {
-//     return ref.substring(10);
-//   }
-// };
-
 const headers = {
   "content-type": "application/json",
   "x-attribution-login": context.actor,
@@ -47,7 +30,7 @@ async function main() {
     pull_number: actionContext.event.issue.number,
   });
 
-  const branch = `${pr.data.head.ref}#${pr.data.head.sha}`;
+  const branch = `${pr.data.head.ref}#${process.env.SHORT_SHA || pr.data.head.sha}`;
 
   const matchedTickedNumber = pr.data.body.match(/SUPMOBILE-\d+/);
 
@@ -60,11 +43,12 @@ async function main() {
     .trim();
 
   const metaData = `DEV BUILD!!!
-${pr.data.title} ${maybeTicketNumber}
-for branch ${branch}
-trigger by @${actionContext.triggering_actor}
+${pr.data.title} #${pr.data.number} ${maybeTicketNumber}
 What to test:
 ${testDetails}
+
+Branch: ${branch}
+Triggered by: @${actionContext.triggering_actor}
 `;
 
   const body = {
